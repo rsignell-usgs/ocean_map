@@ -1,0 +1,2 @@
+cd /usgs/data1/rsignell/ocean_map/coawst
+python merge_vel2.py

@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Ocean Currents Map</title>
+
+
+<script type="application/javascript">
+	
+	
+</script>
+
+<style type="text/css">
+body {
+  font: 14px Verdana;
+  color: rgb(148, 148, 148);
+	background-color: #fff
+}
+
+a {
+	color: #000
+}
+
+.fine-print {
+  font: 12px Verdana;
+  color: #777;	
+}
+
+.unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+
+#callout {
+	position: absolute;
+	visibility: hidden;
+	background: #fff;
+	padding: 10px;
+	z-index: 20000;
+	width: 150px;
+	height: 45px;
+	font-size: 11px;
+	border: 1px solid #bbb;
+	-moz-box-shadow: 3px 3px 3px rgba(0,0,0,.4);
+  -webkit-box-shadow: 3px 3px 3px rgba(0,0,0,.4);
+  box-shadow: 3px 3px 3px rgba(0,0,0,.4);
+	-moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+#city-display {
+	position: absolute;
+	left: 180px;
+	top: 80px;
+	z-index: 20;
+}
+
+#display {
+	position: absolute;
+	left: 180px;
+	top: 80px;
+}
+
+#day {
+	font-size: 18px;
+	font-weight: 700;
+}
+
+#header-line {
+	border: 0;
+	height: 1px;
+	color: rgb(148, 148, 148);
+	background-color: #ccc;
+	width: 1080px;
+	position: absolute;
+	top: 55px;
+	left: 0px;
+}
+
+#image-canvas {
+	visibility: hidden;
+}
+
+
+#legend {
+	position: absolute;
+	left: 0px;
+	top: 390px;
+	z-index: 20;
+}
+
+#map-data {
+	position: absolute;
+	left: 0px;
+	top: 100px;
+}
+
+#map-heading {
+	position: absolute;
+	left: 0px;
+	top: 10px;
+	z-index: 20;
+}
+
+#mask {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	z-index: 10
+}
+
+#mask-holder {
+	position: absolute;
+	overflow: hidden;
+	left: 180px;
+	top: 80px;
+	width: 600px;
+	height: 700px;
+}
+
+
+#time-explanation {
+	font-size: 10px;
+	color: #999;
+}
+
+#title {
+	font-family: Verdana;
+	font-size: 40px;
+	color: #555;
+}
+
+
+#unzoom {
+	position: absolute;
+	left: 0px;
+	top: -40px;
+	z-index: 20;
+}
+
+
+</style>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-31074316-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body onload="init()">
+
+
+<!-- MAP AND TITLE -->
+<div style="position:absolute;left:60px;top:10px">
+  <div id="map-heading">
+    <span id="title">West Coast Surface Currents</span>
+  </div>
+
+  <hr id="header-line" />
+
+  <div  id="map-data">
+    <span id="update-time"></span>
+    <br><br>
+    <span id="average-speed"></span><br><br>
+  </div>
+  <div id="legend">
+    <canvas id="legend1" width=80 height=20></canvas> 0.1 m/s<br><br>
+    <canvas id="legend2" width=80 height=20></canvas> 0.3 m/s<br><br>
+    <canvas id="legend3" width=80 height=20></canvas> 0.5 m/s<br><br>
+    <canvas id="legend4" width=80 height=20></canvas> 1.0 m/s<br><br>
+    <canvas id="legend5" width=80 height=20></canvas> 1.5 m/s<br><br>
+    <canvas id="legend6" width=80 height=20></canvas> 3.0 m/s<br><br>
+    <input style="visibility:hidden" id="animating" type="checkbox" checked></input><br><br> 
+    <input id="unzoom" style="visiblity:hidden" onclick="doUnzoom()" type="button" value="Unzoom"></input>
+  </div>
+
+  <canvas id="display" width=600 height=700 unselectable="on" class="unselectable">    If the map is missing, we recommend the latest
+	<a href="http://www.google.com/chrome">Chrome</a> browser.
+</canvas>
+  <canvas id="city-display" width=600 height=700 unselectable="on" class="unselectable"></canvas>
+  <canvas id="image-canvas" width=600 height=700 unselectable="on" class="unselectable"></canvas>
+  
+  <div id="callout"></div>
+  <div id="mask-holder">
+    <img alt="mask" id="mask" src="west-wms.png" unselectable="on" class="unselectable">
+  </div>
+</div>
+
+
+
+
+<script type="application/javascript">
+
+var loading = true;
+
+var step = 0;
+function showLoading() {
+	var canvas = document.getElementById('display');
+	if (canvas) {
+  	var g = canvas.getContext('2d');
+  	var w = canvas.width;
+  	var h = canvas.height;
+  	g.fillStyle = 'rgb(90,90,90)';
+  	g.fillRect(0, 0, w, h);
+  	step++;
+		var alpha = .3 + (1 + Math.sin(step * .3)) / 3;
+  	g.fillStyle = 'rgba(255, 255, 255, '  + alpha + ')';
+		g.textAlign = 'center';
+		g.font = '14pt Verdana';
+		g.fillText('LOADING', 450, 300);
+  }
+	if (loading) {
+		setTimeout('showLoading()', 50);
+	}
+}
+
+showLoading();
+
+
+</script>
+
+<!-- EXPLANATORY STUFF -->
+<div style="color:#333;position:absolute;left:850px;top:120px;width:300px">
+This map represents a snapshot of daily-averaged ocean surface current assembled from multiple IOOS-Partner forecast models, including:  The <a href="http://ecowatch.ncddc.noaa.gov/thredds/catalog/ncom/ncom_reg7_agg/catalog.html?dataset=ncom/ncom_reg7_agg/NCOM_Region_7_Aggregation_best.ncd"> NCOM Region 7 </a> and the
+<a href="http://www.cencoos.org/thredds/remoteCatalogService?command=subset&catalog=http://oceanmodeling.pmc.ucsc.edu:8080/thredds/catalog/ccsnrt/fmrc/catalog.xml&dataset=ccsnrt/fmrc/CCSNRT_Aggregation_best.ncd"> UCSC CCSNRT ROMS model</a>.
+
+The surface current data is extracted from THREDDS Data Servers via OPeNDAP and averaged over 24 hours. The streaks are created dynamically by JavaScript running in the browser.
+	<br><br>
+Please send feedback and inquiries to: <a href="emailto:rsignell@usgs.gov">Rich Signell</a>.
+        <br><br>
+		
+		This map uses copyrighted technology developed by Fernanda Viegas and Martin Wattenberg (<a href="http://hint.fm">hint.fm</a>) for their stunning <a href="http://hint.fm/wind/">wind map application</a>.  They have graciously allowed us to show visualization of ocean currents here until license issues are resolved.
+        <br><br><br>
+	</div>
+</div>
+
+<script src="jquery-1.7.2.min.js" type="application/javascript"></script>
+<script src="ocean-data.js" type="application/javascript"></script>
+<script src="wind-bundle.js" type="application/javascript"></script>
+
+
+</body>
+</html>

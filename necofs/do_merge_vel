@@ -1,0 +1,2 @@
+cd /usgs/data1/rsignell/ocean_map/necofs
+python merge_vel2.py

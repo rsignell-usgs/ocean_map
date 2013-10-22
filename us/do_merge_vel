@@ -1,0 +1,4 @@
+cd /home/rsignell/python/ocean_map/us
+python merge_vel.py
+cp ocean-data.js /usgs/data1/notebook
+mv ocean-data.js /usgs/data1/rsignell/ocean_map/us

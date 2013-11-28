@@ -105,14 +105,15 @@ ut,vt=surf_vel_roms.surf_vel_roms(x,y,url,date_mid=date_now,hours_ave=24,time_su
 ui=ut
 vi=vt
 
-url ='http://edac-dap3.northerngulfinstitute.org/thredds/dodsC/ncom_amseas_agg/AmSeas_Aggregation_best.ncd'
+url = 'http://ecowatch.ncddc.noaa.gov/thredds/dodsC/ncom_amseas_agg/AmSeas_Apr_05_2013_to_Current_best.ncd'
+
 print url
 ut,vt = surf_vel(x,y,url,uvar='water_u',vvar='water_v',isurf_layer=0,lon360=True,lonlat_sub=2)
 ind = (ui==0)
 ui[ind] = ut[ind]
 vi[ind] = vt[ind]
 
-url ='http://edac-dap3.northerngulfinstitute.org/thredds/dodsC/ncom_useast_agg/US_East_Aggregation_best.ncd'
+url = 'http://ecowatch.ncddc.noaa.gov/thredds/dodsC/ncom_us_east_agg/US_East_Apr_05_2013_to_Current_best.ncd'
 print url
 ut,vt = surf_vel(x,y,url,uvar='water_u',vvar='water_v',isurf_layer=0,lon360=True,lonlat_sub=2)
 ind = (ui==0)
@@ -136,10 +137,9 @@ for nam in ['michigan','huron','erie','ontario','superior']:
     ui[ind] = ut[ind]
     vi[ind] = vt[ind]
     
-
-url='http://ecowatch.ncddc.noaa.gov/thredds/dodsC/ncom/ncom_reg7_agg/NCOM_Region_7_Aggregation_best.ncd'
+url='http://ecowatch.ncddc.noaa.gov/thredds/dodsC/hycom/hycom_reg7_agg/HYCOM_Region_7_Aggregation_best.ncd'
 print url
-ut,vt = surf_vel(x,y,url,uvar='water_u',vvar='water_v',isurf_layer=0,lon360=False,lonlat_sub=1)
+ut,vt = surf_vel(x,y,url,uvar='water_u',vvar='water_v',isurf_layer=0,lon360=True,lonlat_sub=1)
 ind = (ui==0)
 ui[ind] = ut[ind]
 vi[ind] = vt[ind]

@@ -41,12 +41,17 @@ y=np.linspace(y0,y1,gridHeight)
 
 date_now = datetime.datetime.utcnow()
 
-#  UCSC
-url='http://oceanmodeling.pmc.ucsc.edu:8080/thredds/dodsC/ccsnrt/fmrc/CCSNRT_Aggregation_best.ncd'
+#  Rutgers ROMS ESPRESSO
+#url='http://oceanmodeling.pmc.ucsc.edu:8080/thredds/dodsC/ccsnrt/fmrc/CCSNRT_Aggregation_best.ncd'
+
+#ut,vt=surf_vel_roms.surf_vel_roms(x,y,url,date_mid=date_now,hours_ave=24,time_sub=1)
+
 # CCROMS
-url='http://thredds.axiomalaska.com/thredds/dodsC/CA_FCST.nc'
+url ='http://thredds.axiomalaska.com/thredds/dodsC/CA_FCST.nc'
+ut,vt = surf_vel.surf_vel(x,y,url,lonvar='lon',latvar='lat',isurf_layer=0,ugrid=False,time_sub=3)
+
 print url
-ut,vt=surf_vel.surf_vel(x,y,url,date_mid=date_now,hours_ave=24,time_sub=1)
+#ut,vt=surf_vel_roms.surf_vel_roms(x,y,url,date_mid=date_now,hours_ave=24,time_sub=1)
 ui=ut
 vi=vt
 
@@ -68,7 +73,7 @@ if 0:
     vi[ind] = vt[ind]
 
 if 0:
-    url='http://www.smast.umassd.edu:8080/thredds/dodsCVCOM/NECOFS/Forecasts/NECOFS_GOM3_FORECAST.nc'
+    url='http://www.smast.umassd.edu:8080/thredds/dodsC/FVCOM/NECOFS/Forecasts/NECOFS_GOM3_FORECAST.nc'
     print url
     ut,vt = surf_vel.surf_vel(x,y,url,lonvar='lonc',latvar='latc',isurf_layer=0,ugrid=True,time_sub=3)
     ind = (ui==0)
@@ -76,7 +81,7 @@ if 0:
     vi[ind] = vt[ind]
 
 if 1:
-    url='http://ecowatch.ncddc.noaa.gov/thredds/dodsC/ncom/ncom_reg7_agg/NCOM_Region_7_Aggregation_best.ncd'
+url='http://ecowatch.ncddc.noaa.gov/thredds/dodsC/hycom/hycom_reg7_agg/HYCOM_Region_7_Aggregation_best.ncd'
     print url
     ut,vt = surf_vel.surf_vel(x,y,url,uvar='water_u',vvar='water_v',isurf_layer=0,lon360=False,lonlat_sub=1)
     ind = (ui==0)

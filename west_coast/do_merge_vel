@@ -1,3 +1,0 @@
-cd /home/rsignell/python/ocean_map/west_coast 
-python merge_vel.py
-mv ocean-data.js /usgs/data1/rsignell/ocean_map/west_coast
